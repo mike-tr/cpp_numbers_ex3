@@ -141,14 +141,169 @@ TEST_CASE("Test unit arithmetics different Units") {
     double convert_rl_ff = 5;
 
     for (size_t i = 0; i < number_of_tests; i++) {
-        double v1 = NextDouble() + 1;
-        double v2 = NextDouble() + 1;
-        double v3 = NextDouble() + 1;
+        double vff = NextDouble() + 1; // ff
+        double vrl = NextDouble() + 1; // rl
+        double vim = NextDouble() + 1; //
 
-        NumberWithUnits n1{v1, "ff"};
-        NumberWithUnits n2{v2, "rl"};
-        NumberWithUnits n2{v2, "im"};
+        NumberWithUnits nff{vff, "ff"};
+        NumberWithUnits nrl{vrl, "rl"};
+        NumberWithUnits nim{vim, "im"};
 
-        NumberWithUnits n1_rl = { v1 }
+        double vff_rl = vff / convert_rl_ff;
+        double vrl_ff = vrl * convert_rl_ff;
+        double vim_ff = vim * convert_im_rl * convert_rl_ff;
+        double vff_im = vff / (convert_im_rl * convert_rl_ff);
+
+        NumberWithUnits nff_rl = {vff_rl, "rl"};
+        NumberWithUnits nrl_ff = {vrl_ff, "ff"};
+        NumberWithUnits nim_ff = {vim_ff, "ff"};
+        NumberWithUnits nff_im = {vff_im, "im"};
+
+        string check_ff_add_rl = vff + vrl_ff + string{"[ff]"};
+        string check_rl_add_ff = vrl + vff_rl + string{"[rl]"};
+        string check_im_add_ff = vim + vff_im + string{"[im]"};
+        string check_ff_add_im = vff + vim_ff + string{"[ff]"};
+
+        string check_ff_minus_rl = vff - vrl_ff + string{"[ff]"};
+        string check_rl_minus_ff = vrl - vff_rl + string{"[rl]"};
+        string check_im_minus_ff = vim - vff_im + string{"[im]"};
+        string check_ff_minus_im = vff - vim_ff + string{"[ff]"};
+
+        CHECK((check_ff_add_rl == nff + nrl));
+        CHECK((check_rl_add_ff == nrl + nff));
+        CHECK((check_im_add_ff == nim + nff));
+        CHECK((check_ff_add_im == nff + nim));
+
+        CHECK((check_ff_minus_rl == nff - nrl));
+        CHECK((check_rl_minus_ff == nrl - nff));
+        CHECK((check_im_minus_ff == nim - nff));
+        CHECK((check_ff_minus_im == nff - nim));
+
+        // CHECK EQUALS AFTER CONVERSION
+        CHECK((nff_rl == nff));
+        CHECK((nff_im == nff));
+        CHECK((nrl_ff == nrl));
+        CHECK((nim_ff == nim));
+        CHECK((nff_rl <= nff));
+        CHECK((nff_im >= nff));
+        CHECK((nrl_ff <= nrl));
+        CHECK((nim_ff >= nim));
+    }
+}
+
+TEST_CASE("Test ++, --, +=") {
+    CreateFakeUnits("1 im =    10.5 rl \n 1 rl =    5 ff \n   1    pi = 180 deg");
+    for (size_t i = 0; i < number_of_tests; i++) {
+        double v1 = NextDouble();
+        double v2 = NextDouble();
+        double v3 = NextDouble();
+        double v_add = NextDouble();
+        NumberWithUnits n_pe{v1, "im"};
+        NumberWithUnits n_add{v_add, "im"};
+        NumberWithUnits n_pp{v2, "rl"};
+        NumberWithUnits n_mm{v2, "rl"};
+
+        for (size_t j = 0; j < number_of_inner_test; j++) {
+            v1 += v_add;
+            string check_str = v1 + string{"im"};
+
+            n_pe += n_add;
+            CHECK((n_pe == check_str));
+
+            v2++;
+            n_pp++;
+            check_str = v2 + string{"im"};
+            CHECK((n_pp == check_str));
+
+            v3--;
+            n_mm--;
+            check_str = v3 + string{"rl"};
+            CHECK((n_mm == check_str));
+        }
+    }
+}
+
+TEST_CASE("Test diff units bolean ") {
+    CreateFakeUnits("1 im =    10.5 rl \n 1 rl =    5 ff \n   1    pi = 180 deg");
+
+    double convert_im_rl = 10.5;
+    double convert_rl_ff = 5;
+
+    for (size_t i = 0; i < number_of_tests; i++) {
+        double v = NextDouble() + 1; // ff
+
+        NumberWithUnits nff{v, "ff"};
+        NumberWithUnits nrl{v, "rl"};
+        NumberWithUnits nim{v, "im"};
+
+        CHECK((nff < nrl));
+        CHECK((nff <= nrl));
+        CHECK((nff < nim));
+        CHECK((nff <= nim));
+        CHECK((nrl < nim));
+        CHECK((nrl <= nim));
+
+        CHECK((nrl > nff));
+        CHECK((nrl >= nff));
+        CHECK((nim > nff));
+        CHECK((nim >= nff));
+        CHECK((nim > nrl));
+        CHECK((nim >= nrl));
+
+        CHECK((nff != nrl));
+        CHECK((nff != nrl));
+        CHECK((nff != nim));
+        CHECK((nff != nim));
+        CHECK((nrl != nim));
+        CHECK((nrl != nim));
+
+        CHECK((nrl != nff));
+        CHECK((nrl != nff));
+        CHECK((nim != nff));
+        CHECK((nim != nff));
+        CHECK((nim != nrl));
+        CHECK((nim != nrl));
+
+        CHECK((nff + nff > nff));
+        CHECK((nff + nrl > nrl));
+        CHECK((nff + nim > nim));
+        CHECK((nff + nrl == nrl + nff));
+        CHECK((nff + nim == nim + nff));
+        CHECK((nff + nim - nrl < nim));
+
+        CHECK((nff - (0.5 * nff) < nff));
+        CHECK((nff - (0.5 * nff) == (0.5 * nff)));
+    }
+}
+
+TEST_CASE("CHECK THROWS") {
+    CreateFakeUnits("1 im =    10.5 rl \n 1 rl =    5 PI \n   1    pi = 180 deg");
+    for (size_t i = 0; i < number_of_tests; i++) {
+        double v1 = NextDouble();
+        double v2 = NextDouble();
+
+        NumberWithUnits nim{v1, "im"};
+        NumberWithUnits npi{v2, "pi"};
+        NumberWithUnits nrl{v1, "rl"};
+        NumberWithUnits ndeg{v2, "deg"};
+        NumberWithUnits nPI{v1, "PI"};
+
+        CHECK_THROWS((nim + npi));
+        CHECK_THROWS((nim - ndeg));
+        CHECK_THROWS((nrl - npi));
+        CHECK_THROWS((nrl + ndeg));
+        CHECK_THROWS((nPI - npi));
+        CHECK_THROWS((nPI + ndeg));
+
+        CHECK_THROWS((npi - nPI));
+        CHECK_THROWS((ndeg + nPI));
+        CHECK_THROWS((npi - nrl));
+        CHECK_THROWS((ndeg + nrl));
+        CHECK_THROWS((npi + nim));
+        CHECK_THROWS((ndeg - nim));
+
+        CHECK_THROWS((NumberWithUnits{v1, "Im"}));
+        CHECK_THROWS((NumberWithUnits{v2, "xx"}));
+        CHECK_THROWS((NumberWithUnits{v1 + v2, "iP"}));
     }
 }

@@ -24,8 +24,14 @@ public:
     const bool operator!=(const NumberWithUnits &number) const;
     const bool operator<=(const NumberWithUnits &number) const;
     const bool operator>=(const NumberWithUnits &number) const;
-    const NumberWithUnits operator-(NumberWithUnits &number) const;
-    const NumberWithUnits operator+(NumberWithUnits &number) const;
+    const NumberWithUnits operator-(const NumberWithUnits &number) const;
+    const NumberWithUnits operator+(const NumberWithUnits &number) const;
+    NumberWithUnits &operator=(const NumberWithUnits &number);
+
+    NumberWithUnits &operator++();
+    NumberWithUnits &operator--();
+    const NumberWithUnits operator++(int);
+    const NumberWithUnits operator--(int);
 
     friend std::ostream &operator<<(std::ostream &os, const NumberWithUnits &c);
     friend std::istream &operator>>(std::istream &input, NumberWithUnits &c);

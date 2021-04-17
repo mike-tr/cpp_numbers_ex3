@@ -37,11 +37,39 @@ const bool NumberWithUnits::operator<=(const NumberWithUnits &number) const {
 const bool NumberWithUnits::operator>=(const NumberWithUnits &number) const {
     return true;
 }
-const NumberWithUnits NumberWithUnits::operator-(NumberWithUnits &number) const {
+const NumberWithUnits NumberWithUnits::operator-(const NumberWithUnits &number) const {
     return number;
 }
-const NumberWithUnits NumberWithUnits::operator+(NumberWithUnits &number) const {
+const NumberWithUnits NumberWithUnits::operator+(const NumberWithUnits &number) const {
     return number;
+}
+
+NumberWithUnits &NumberWithUnits::operator++() {
+    this->val++;
+    return *this;
+}
+NumberWithUnits &NumberWithUnits::operator--() {
+    this->val--;
+    return *this;
+}
+const NumberWithUnits NumberWithUnits::operator++(int) {
+    NumberWithUnits temp = *this;
+    this->val++;
+    return temp;
+}
+const NumberWithUnits NumberWithUnits::operator--(int) {
+    NumberWithUnits temp = *this;
+    this->val--;
+    return temp;
+}
+
+NumberWithUnits &NumberWithUnits::operator=(const NumberWithUnits &number) {
+    if (&number == this) {
+        return *this;
+    }
+    this->unit = number.unit;
+    this->val = number.val;
+    return *this;
 }
 
 ostream &operator<<(ostream &os, const NumberWithUnits &c) {
