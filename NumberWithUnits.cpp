@@ -57,9 +57,8 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
     }
     file >> exchange_rate_val;
     if (exchange_rate_val == 0) {
-        throw invalid_argument{"exchange rate rannot be zero!"};
+        throw invalid_argument{"exchange rate cannot be 0"};
     }
-
     file >> unit_to;
 
     if (exchange_rate.count({unit_from, unit_to}) > 0) {
@@ -100,7 +99,7 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
             continue;
         }
 
-        if (exchange_rate.count({types[i], unit_from}) > 0) {
+        if (exchange_rate.count({types[i], unit_from}) > 0 && exchange_rate.count({types[i], unit_to}) == 0) {
             double rate = exchange_rate[{types[i], unit_from}] * exchange_rate_val;
 
             exchange_rate[{types[i], unit_to}] = rate;
@@ -110,7 +109,7 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
             // cout << "added exchange from :" << types[i] << " to " << unit_to << " rate :" << rate << endl;
         }
 
-        if (exchange_rate.count({unit_to, types[i]}) > 0) {
+        if (exchange_rate.count({unit_to, types[i]}) > 0 && exchange_rate.count({unit_from, types[i]}) == 0) {
             double rate = exchange_rate[{unit_to, types[i]}] * exchange_rate_val;
 
             exchange_rate[{unit_from, types[i]}] = rate;
@@ -181,10 +180,11 @@ const NumberWithUnits NumberWithUnits::convert_to_type(const string &unit) const
         return *this;
     }
 
-    if (exchange_rate.count({this->unit, unit}) == 0) {
+    auto key = make_pair(this->unit, unit);
+    if (exchange_rate.count(key) == 0) {
         throw invalid_argument{"cannot convert from " + this->unit + " to " + unit};
     }
-    double ex_rate = exchange_rate[{this->unit, unit}];
+    double ex_rate = exchange_rate[key];
     return NumberWithUnits{ex_rate * this->val, unit};
 }
 
