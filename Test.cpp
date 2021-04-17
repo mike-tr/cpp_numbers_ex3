@@ -328,6 +328,25 @@ TEST_CASE("Test diff units bolean ") {
     }
 }
 
+TEST_CASE("3 dim sys") {
+    CreateFakeUnits("1 hour = 60min \n 1 sec = 100 msec \n 1min = 60 sec");
+    for (size_t i = 0; i < number_of_tests; i++) {
+        double v1 = NextDouble();
+
+        NumberWithUnits nhour{v1, "hour"};
+        NumberWithUnits nmin{v1, "min"};
+        NumberWithUnits nsec{v1, "sec"};
+        NumberWithUnits nmsec{v1, "msec"};
+
+        CHECK((nhour == nmin * 60));
+        CHECK((nhour == nsec * 3600));
+        CHECK((nhour == nmsec * 360000));
+        CHECK((nsec == nmin * (1.0 / 60)));
+        CHECK((nsec == nhour * (1.0 / 3600)));
+        CHECK((nsec == nmsec * 100));
+    }
+}
+
 TEST_CASE("CHECK THROWS") {
     CreateFakeUnits("1 im =    10.5 rl \n 1 rl =    5 PI \n   1    pi = 180 deg");
     for (size_t i = 0; i < number_of_tests; i++) {
