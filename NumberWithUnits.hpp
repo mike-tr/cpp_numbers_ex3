@@ -9,7 +9,7 @@ namespace ariel {
 class NumberWithUnits {
 private:
     std::string unit;
-    double value;
+    double val;
     static std::map<std::pair<std::string, std::string>, double> exchange_rate;
     static std::vector<std::string> types;
 
@@ -24,8 +24,7 @@ public:
 
     NumberWithUnits &operator+=(const NumberWithUnits &number);
 
-    const bool
-    operator<(const NumberWithUnits &number) const;
+    const bool operator<(const NumberWithUnits &number) const;
     const bool operator>(const NumberWithUnits &number) const;
     const bool operator==(const NumberWithUnits &number) const;
     const bool operator!=(const NumberWithUnits &number) const;

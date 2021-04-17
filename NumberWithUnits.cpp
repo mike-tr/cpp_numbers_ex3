@@ -158,7 +158,7 @@ bool NumberWithUnits::contains_type(string type) {
 }
 
 NumberWithUnits::NumberWithUnits(double val, string unit) {
-    this->value = val;
+    this->val = val;
     this->unit = unit;
 
     if (!contains_type(unit)) {
@@ -179,32 +179,32 @@ const NumberWithUnits NumberWithUnits::convert_to_type(string unit) const {
         throw invalid_argument{"cannot convert from " + this->unit + " to " + unit};
     }
     double ex_rate = exchange_rate[{this->unit, unit}];
-    return NumberWithUnits{ex_rate * this->value, unit};
+    return NumberWithUnits{ex_rate * this->val, unit};
 }
 
 const NumberWithUnits NumberWithUnits::operator*(double val) const {
-    return NumberWithUnits{this->value * val, this->unit};
+    return NumberWithUnits{this->val * val, this->unit};
 }
 
 NumberWithUnits &NumberWithUnits::operator+=(const NumberWithUnits &number) {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
-    this->value += nconverted.value;
+    this->val += nconverted.val;
     return *this;
 }
 
 const bool NumberWithUnits::operator<(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
-    return definetly_smaller(this->value, nconverted.value);
+    return definetly_smaller(this->val, nconverted.val);
 }
 
 const bool NumberWithUnits::operator>(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
-    return definetly_greater(this->value, nconverted.value);
+    return definetly_greater(this->val, nconverted.val);
 }
 
 const bool NumberWithUnits::operator==(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
-    return definetly_equals(this->value, nconverted.value);
+    return definetly_equals(this->val, nconverted.val);
 }
 
 const bool NumberWithUnits::operator!=(const NumberWithUnits &number) const {
@@ -221,30 +221,30 @@ const bool NumberWithUnits::operator>=(const NumberWithUnits &number) const {
 
 const NumberWithUnits NumberWithUnits::operator-(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
-    return NumberWithUnits{this->value - nconverted.value, this->unit};
+    return NumberWithUnits{this->val - nconverted.val, this->unit};
 }
 
 const NumberWithUnits NumberWithUnits::operator+(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
-    return NumberWithUnits{this->value + nconverted.value, this->unit};
+    return NumberWithUnits{this->val + nconverted.val, this->unit};
 }
 
 NumberWithUnits &NumberWithUnits::operator++() {
-    this->value++;
+    this->val++;
     return *this;
 }
 NumberWithUnits &NumberWithUnits::operator--() {
-    this->value--;
+    this->val--;
     return *this;
 }
 const NumberWithUnits NumberWithUnits::operator++(int) {
     NumberWithUnits temp = *this;
-    this->value++;
+    this->val++;
     return temp;
 }
 const NumberWithUnits NumberWithUnits::operator--(int) {
     NumberWithUnits temp = *this;
-    this->value--;
+    this->val--;
     return temp;
 }
 
@@ -253,12 +253,12 @@ NumberWithUnits &NumberWithUnits::operator=(const NumberWithUnits &number) {
         return *this;
     }
     this->unit = number.unit;
-    this->value = number.value;
+    this->val = number.val;
     return *this;
 }
 
 ostream &operator<<(ostream &os, const NumberWithUnits &c) {
-    os << c.value << "[" << c.unit << "]";
+    os << c.val << "[" << c.unit << "]";
     //os << "kek";
     return os;
 }
@@ -299,16 +299,16 @@ istream &operator>>(istream &input, NumberWithUnits &c) {
         throw invalid_argument{"unit " + unit + " doesnt exist!"};
     }
 
-    c.value = val;
+    c.val = val;
     c.unit = unit;
 
     return input;
 }
 const NumberWithUnits operator*(double val, const NumberWithUnits &number) {
-    return NumberWithUnits{number.value * val, number.unit};
+    return NumberWithUnits{number.val * val, number.unit};
 }
 const NumberWithUnits operator-(const NumberWithUnits &number) {
-    return NumberWithUnits{-number.value, number.unit};
+    return NumberWithUnits{-number.val, number.unit};
 }
 const NumberWithUnits operator+(const NumberWithUnits &number) {
     return number;
