@@ -19,7 +19,7 @@ using namespace ariel;
 #include <string>
 using namespace std;
 
-const int number_of_tests = 20;
+const int number_of_tests = 10;
 const int number_of_inner_test = 5;
 const int max_rand = 1000;
 const int div_factor = 100;
