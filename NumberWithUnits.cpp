@@ -6,9 +6,9 @@ using namespace std;
 
 double epsilone = 0.00001;
 
+// doubles comparisons is tricky, becuase they are not really "equal",
+// then we would say they are, so we need to check how "close" they are to be equal.
 bool definetly_equals(double a, double b) {
-    // cout << a << " : " << b << endl;
-    // cout << fabs(a - b) << endl;
     return fabs(a - b) <= epsilone;
 }
 
@@ -41,6 +41,7 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
     string unit_from, unit_to;
     file >> v1;
     if (v1 != 1) {
+        // if the format fails, i will consider it as endof file.
         // end of file
         return false;
     }
@@ -49,6 +50,8 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
     if (unit_to != "=") {
         //cout << v1 << unit_from << " : " << unit_to << endl;
         //throw invalid_argument{"Wrong format, format should be \"1 something = x something_else\""};
+
+        // if the format fails, i will consider it as endof file.
         return false;
     }
     file >> exchange_rate_val;
@@ -193,27 +196,34 @@ const bool NumberWithUnits::operator<(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return definetly_smaller(this->val, nconverted.val);
 }
+
 const bool NumberWithUnits::operator>(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return definetly_greater(this->val, nconverted.val);
 }
+
 const bool NumberWithUnits::operator==(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return definetly_equals(this->val, nconverted.val);
 }
+
 const bool NumberWithUnits::operator!=(const NumberWithUnits &number) const {
     return !(*this == number);
 }
+
 const bool NumberWithUnits::operator<=(const NumberWithUnits &number) const {
     return (*this < number) || (*this == number);
 }
+
 const bool NumberWithUnits::operator>=(const NumberWithUnits &number) const {
     return (*this > number) || (*this == number);
 }
+
 const NumberWithUnits NumberWithUnits::operator-(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return NumberWithUnits{this->val - nconverted.val, this->unit};
 }
+
 const NumberWithUnits NumberWithUnits::operator+(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return NumberWithUnits{this->val + nconverted.val, this->unit};
@@ -252,23 +262,39 @@ ostream &operator<<(ostream &os, const NumberWithUnits &c) {
     //os << "kek";
     return os;
 }
+
 istream &operator>>(istream &input, NumberWithUnits &c) {
     double val;
     string unit;
 
     input >> val;
-    if (input.peek() == ' ') {
-        input.ignore(256, ' ');
-    }
-    input.ignore(256, '[');
     input >> unit;
 
-    int l = unit.size();
-    unit.erase(unit.find_last_not_of(']') + 1, std::string::npos);
-    if (l == unit.size()) {
+    // make sure the format is:
+    // number [ unit ]
+    // with or without spaces.
+
+    // check starting bracket
+    if (unit == "[") {
+        input >> unit;
+    } else if (unit[0] == '[') {
+        unit = unit.erase(0, 1);
+    } else {
         throw invalid_argument{"wrong format should be of format val [ unit ]"};
     }
 
+    // check ending bracket/
+    if (unit[unit.size() - 1] == ']') {
+        unit = unit.erase(unit.size() - 1, 1);
+    } else {
+        string next;
+        input >> next;
+        if (next[0] != ']') {
+            throw invalid_argument{"wrong format should be of format val [ unit ]"};
+        }
+    }
+
+    // check if unit is viable.
     if (!NumberWithUnits::contains_type(unit)) {
         throw invalid_argument{"unit " + unit + " doesnt exist!"};
     }

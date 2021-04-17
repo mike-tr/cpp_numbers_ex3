@@ -110,7 +110,7 @@ TEST_CASE("TEST pass string") {
 
         NumberWithUnits n1{v1, "ff"};
 
-        string str_n1 = v1 + string{"   [         ff]"};
+        string str_n1 = v1 + string{"        [         ff]"};
 
         NumberWithUnits temp{v1 - 1, "rl"};
 
@@ -124,6 +124,14 @@ TEST_CASE("TEST pass string") {
         sample_input << "1231 [ ff ";
         //cout << sample_input.str() << endl;
         CHECK_THROWS((sample_input >> temp));
+        sample_input = stringstream{};
+
+        sample_input << "1231  ff ]";
+        CHECK_THROWS((sample_input >> temp));
+        sample_input = stringstream{};
+
+        sample_input << "1231 [ ff ]";
+        CHECK((sample_input >> temp));
         sample_input = stringstream{};
 
         sample_input << n1;
