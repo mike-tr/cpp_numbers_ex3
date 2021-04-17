@@ -24,7 +24,9 @@ int main() {
     NumberWithUnits a{2, "km"}; // 2 kilometers
     cout << a << endl;          // Prints "2[km]".
     cout << (-a) << endl;       // Prints "-2[km]"
-    cout << "kek2" << endl;
+    cout << a.convert_to_type("m") << endl;
+    cout << a.convert_to_type("mm") << endl;
+    cout << a.convert_to_type("m").convert_to_type("km") << endl;
     cout << (3 * a) << endl; // Prints "6[km]"
 
     NumberWithUnits b{300, "m"}; // 300 meters
@@ -38,7 +40,6 @@ int main() {
 
     istringstream sample_input{"700 [ kg ]"};
     sample_input >> a;
-    cout << "kekeke" << endl;
     cout << a << endl;                                // Prints "700[kg]"
     cout << (a += NumberWithUnits{1, "ton"}) << endl; // prints "1700[kg]"
     cout << a << endl;                                // Prints "1700[kg]". Note that a has changed.
