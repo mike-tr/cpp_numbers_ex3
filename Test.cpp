@@ -188,6 +188,9 @@ TEST_CASE("Test unit arithmetics different Units") {
         CHECK((nff_im >= nff));
         CHECK((nrl_ff <= nrl));
         CHECK((nim_ff >= nim));
+
+        CHECK((nff == +nff));
+        CHECK((+nff == nff));
     }
 }
 
@@ -202,6 +205,8 @@ TEST_CASE("Test ++, --, +=") {
         NumberWithUnits n_add{v_add, "im"};
         NumberWithUnits n_pp{v2, "rl"};
         NumberWithUnits n_mm{v2, "rl"};
+        NumberWithUnits pp_n{v2, "rl"};
+        NumberWithUnits mm_n{v2, "rl"};
 
         for (size_t j = 0; j < number_of_inner_test; j++) {
             v1 += v_add;
@@ -210,15 +215,17 @@ TEST_CASE("Test ++, --, +=") {
             n_pe += n_add;
             CHECK((n_pe == check_str));
 
-            v2++;
-            n_pp++;
             check_str = v2 + string{"im"};
-            CHECK((n_pp == check_str));
+            CHECK((++pp_n == check_str));
+            v2++;
+            check_str = v2 + string{"im"};
+            CHECK((n_pp++ == check_str));
 
-            v3--;
-            n_mm--;
             check_str = v3 + string{"rl"};
-            CHECK((n_mm == check_str));
+            CHECK((--mm_n == check_str));
+            v3--;
+            check_str = v3 + string{"rl"};
+            CHECK((n_mm-- == check_str));
         }
     }
 }
