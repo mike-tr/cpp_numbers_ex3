@@ -9,7 +9,7 @@ namespace ariel {
 class NumberWithUnits {
 private:
     std::string unit;
-    double val;
+    double value;
     static std::map<std::pair<std::string, std::string>, double> exchange_rate;
     static std::vector<std::string> types;
 
