@@ -4,7 +4,7 @@
 
 using namespace std;
 
-double epsilone = 0.00001;
+const double epsilone = 0.00001;
 
 // doubles comparisons is tricky, becuase they are not really "equal",
 // then we would say they are, so we need to check how "close" they are to be equal.
@@ -36,9 +36,10 @@ void NumberWithUnits::read_units(std::ifstream &file) {
  * and integrading all the background stuff necessary to make it work with all the other units.
  * */
 bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, vector<string> &types) {
-    double v1;
-    double exchange_rate_val;
-    string unit_from, unit_to;
+    double v1 = 0;
+    double exchange_rate_val = 0;
+    string unit_from;
+    string unit_to;
     file >> v1;
     if (v1 != 1) {
         // if the format fails, i will consider it as endof file.
@@ -55,9 +56,13 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
         return false;
     }
     file >> exchange_rate_val;
+    if (exchange_rate_val == 0) {
+        throw invalid_argument{"exchange rate rannot be zero!"};
+    }
+
     file >> unit_to;
 
-    if (exchange_rate.count({unit_from, unit_to})) {
+    if (exchange_rate.count({unit_from, unit_to}) > 0) {
         throw invalid_argument{"Cannot have duplicate exchange rates!"};
     }
 
@@ -89,12 +94,13 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
         if (types[i] == unit_from) {
             contains_u1 = true;
             continue;
-        } else if (types[i] == unit_to) {
+        }
+        if (types[i] == unit_to) {
             contains_u2 = true;
             continue;
         }
 
-        if (exchange_rate.count({types[i], unit_from}) && !exchange_rate.count({types[i], unit_to})) {
+        if (exchange_rate.count({types[i], unit_from}) > 0) {
             double rate = exchange_rate[{types[i], unit_from}] * exchange_rate_val;
 
             exchange_rate[{types[i], unit_to}] = rate;
@@ -104,7 +110,7 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
             // cout << "added exchange from :" << types[i] << " to " << unit_to << " rate :" << rate << endl;
         }
 
-        if (exchange_rate.count({unit_to, types[i]}) && !exchange_rate.count({unit_from, types[i]})) {
+        if (exchange_rate.count({unit_to, types[i]}) > 0) {
             double rate = exchange_rate[{unit_to, types[i]}] * exchange_rate_val;
 
             exchange_rate[{unit_from, types[i]}] = rate;
@@ -148,7 +154,7 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
     return true;
 }
 
-bool NumberWithUnits::contains_type(string type) {
+bool NumberWithUnits::contains_type(const string &type) {
     for (size_t i = 0; i < types.size(); i++) {
         if (type == types[i]) {
             return true;
@@ -157,7 +163,7 @@ bool NumberWithUnits::contains_type(string type) {
     return false;
 }
 
-NumberWithUnits::NumberWithUnits(double val, string unit) {
+NumberWithUnits::NumberWithUnits(double val, const string &unit) {
     this->val = val;
     this->unit = unit;
 
@@ -170,12 +176,12 @@ NumberWithUnits::NumberWithUnits(double val, string unit) {
  * convert given number to a different number unit
  * Throws error if convertion is imposible.
  * */
-const NumberWithUnits NumberWithUnits::convert_to_type(string unit) const {
+const NumberWithUnits NumberWithUnits::convert_to_type(const string &unit) const {
     if (unit == this->unit) {
         return *this;
     }
 
-    if (!exchange_rate[{this->unit, unit}]) {
+    if (exchange_rate.count({this->unit, unit}) == 0) {
         throw invalid_argument{"cannot convert from " + this->unit + " to " + unit};
     }
     double ex_rate = exchange_rate[{this->unit, unit}];
@@ -192,30 +198,30 @@ NumberWithUnits &NumberWithUnits::operator+=(const NumberWithUnits &number) {
     return *this;
 }
 
-const bool NumberWithUnits::operator<(const NumberWithUnits &number) const {
+bool NumberWithUnits::operator<(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return definetly_smaller(this->val, nconverted.val);
 }
 
-const bool NumberWithUnits::operator>(const NumberWithUnits &number) const {
+bool NumberWithUnits::operator>(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return definetly_greater(this->val, nconverted.val);
 }
 
-const bool NumberWithUnits::operator==(const NumberWithUnits &number) const {
+bool NumberWithUnits::operator==(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return definetly_equals(this->val, nconverted.val);
 }
 
-const bool NumberWithUnits::operator!=(const NumberWithUnits &number) const {
+bool NumberWithUnits::operator!=(const NumberWithUnits &number) const {
     return !(*this == number);
 }
 
-const bool NumberWithUnits::operator<=(const NumberWithUnits &number) const {
+bool NumberWithUnits::operator<=(const NumberWithUnits &number) const {
     return (*this < number) || (*this == number);
 }
 
-const bool NumberWithUnits::operator>=(const NumberWithUnits &number) const {
+bool NumberWithUnits::operator>=(const NumberWithUnits &number) const {
     return (*this > number) || (*this == number);
 }
 
@@ -264,7 +270,7 @@ ostream &operator<<(ostream &os, const NumberWithUnits &c) {
 }
 
 istream &operator>>(istream &input, NumberWithUnits &c) {
-    double val;
+    double val = 0;
     string unit;
 
     input >> val;
