@@ -257,8 +257,17 @@ TEST_CASE("Test ++, --, +=") {
             v1 += v_add;
             string check_str = v1 + string{"[im]"};
 
-            n_pe += n_add;
+            (n_pe += 2 * n_add) -= n_add;
+            // n_pe += n_add;
+            // cout << n_pe << " : " << check_str << endl;
             CHECK((n_pe == check_str));
+
+            v1 -= v_add;
+            n_pe -= n_add;
+            check_str = v1 + string{"[im]"};
+            CHECK((n_pe == check_str));
+            n_pe += n_add;
+            v1 += v_add;
 
             check_str = v2 + string{"[im]"};
             CHECK((pp_n++ == check_str));

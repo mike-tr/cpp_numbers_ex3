@@ -23,6 +23,7 @@ public:
     const NumberWithUnits operator*(double val) const;
 
     NumberWithUnits &operator+=(const NumberWithUnits &number);
+    NumberWithUnits &operator-=(const NumberWithUnits &number);
 
     bool operator<(const NumberWithUnits &number) const;
     bool operator>(const NumberWithUnits &number) const;

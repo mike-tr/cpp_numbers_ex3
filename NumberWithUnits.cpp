@@ -13,11 +13,12 @@ bool definetly_equals(double a, double b) {
 }
 
 bool definetly_greater(double a, double b) {
+    //cout << " a < b" a << " " << b << endl;
     return (a - b) > epsilone;
 }
 
 bool definetly_smaller(double a, double b) {
-    return fabs(b - a) > epsilone;
+    return definetly_greater(b, a);
 }
 
 namespace ariel {
@@ -99,6 +100,9 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
             continue;
         }
 
+        // if there is a conversion from other type to this unit form
+        // and no conversion from that type to the converted type,
+        // add a conversion from that type to the new converted type
         if (exchange_rate.count({types[i], unit_from}) > 0 && exchange_rate.count({types[i], unit_to}) == 0) {
             double rate = exchange_rate[{types[i], unit_from}] * exchange_rate_val;
 
@@ -109,6 +113,9 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
             // cout << "added exchange from :" << types[i] << " to " << unit_to << " rate :" << rate << endl;
         }
 
+        // if there is a conversion from the converted type to some type
+        // and no conversion from the converting unit to that same type
+        // add a conversion from that type to the new converted type
         if (exchange_rate.count({unit_to, types[i]}) > 0 && exchange_rate.count({unit_from, types[i]}) == 0) {
             double rate = exchange_rate[{unit_to, types[i]}] * exchange_rate_val;
 
@@ -198,6 +205,12 @@ NumberWithUnits &NumberWithUnits::operator+=(const NumberWithUnits &number) {
     return *this;
 }
 
+NumberWithUnits &NumberWithUnits::operator-=(const NumberWithUnits &number) {
+    const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
+    this->val -= nconverted.val;
+    return *this;
+}
+
 bool NumberWithUnits::operator<(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return definetly_smaller(this->val, nconverted.val);
@@ -265,7 +278,6 @@ NumberWithUnits &NumberWithUnits::operator=(const NumberWithUnits &number) {
 
 ostream &operator<<(ostream &os, const NumberWithUnits &c) {
     os << c.val << "[" << c.unit << "]";
-    //os << "kek";
     return os;
 }
 
