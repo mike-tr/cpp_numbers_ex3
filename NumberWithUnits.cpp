@@ -27,7 +27,8 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
 std::map<std::pair<std::string, std::string>, double> NumberWithUnits::exchange_rate;
 std::vector<std::string> NumberWithUnits::types;
 void NumberWithUnits::read_units(std::ifstream &file) {
-    exchange_rate.clear();
+    // exchange_rate.clear();
+    // types.clear();
     while (!file.eof() && add_line(file, exchange_rate, types)) {
     }
 }
@@ -63,7 +64,10 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
     file >> unit_to;
 
     if (exchange_rate.count({unit_from, unit_to}) > 0) {
-        throw invalid_argument{"Cannot have duplicate exchange rates!"};
+        if (exchange_rate_val != exchange_rate[{unit_from, unit_to}]) {
+            throw invalid_argument{"Cannot have duplicate exchange rates!"};
+        }
+        return true;
     }
 
     if (unit_to == unit_from) {
@@ -138,11 +142,13 @@ bool add_line(ifstream &file, map<pair<string, string>, double> &exchange_rate, 
     // 1 km = 100000 cm and 1 m = 1000 mm.
     // but this step will calculate that
     // 1 km = 1000000 mm
+
     for (size_t i = 0; i < connect_from.size(); i++) {
         for (size_t j = 0; j < connect_to.size(); j++) {
-            double rate = exchange_rate[{connect_from[i], unit_from}] * exchange_rate[{unit_from, connect_to[i]}];
-            exchange_rate[{connect_from[i], connect_to[i]}] = rate;
-            exchange_rate[{connect_to[i], connect_from[i]}] = 1 / rate;
+            // cout << connect_from[i] << " << " << connect_to[j] << endl;
+            double rate = exchange_rate[{connect_from[i], unit_from}] * exchange_rate[{unit_from, connect_to[j]}];
+            exchange_rate[{connect_from[i], connect_to[j]}] = rate;
+            exchange_rate[{connect_to[j], connect_from[i]}] = 1 / rate;
 
             // cout << "added exchange from :" << connect_from[i] << " to " << connect_to[i] << " rate :" << rate << endl;
         }
