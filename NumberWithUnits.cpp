@@ -188,7 +188,7 @@ NumberWithUnits::NumberWithUnits(double val, const string &unit) {
  * convert given number to a different number unit
  * Throws error if convertion is imposible.
  * */
-const NumberWithUnits NumberWithUnits::convert_to_type(const string &unit) const {
+NumberWithUnits NumberWithUnits::convert_to_type(const string &unit) const {
     if (unit == this->unit) {
         return *this;
     }
@@ -201,7 +201,7 @@ const NumberWithUnits NumberWithUnits::convert_to_type(const string &unit) const
     return NumberWithUnits{ex_rate * this->val, unit};
 }
 
-const NumberWithUnits NumberWithUnits::operator*(double val) const {
+NumberWithUnits NumberWithUnits::operator*(double val) const {
     return NumberWithUnits{this->val * val, this->unit};
 }
 
@@ -244,12 +244,12 @@ bool NumberWithUnits::operator>=(const NumberWithUnits &number) const {
     return (*this > number) || (*this == number);
 }
 
-const NumberWithUnits NumberWithUnits::operator-(const NumberWithUnits &number) const {
+NumberWithUnits NumberWithUnits::operator-(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return NumberWithUnits{this->val - nconverted.val, this->unit};
 }
 
-const NumberWithUnits NumberWithUnits::operator+(const NumberWithUnits &number) const {
+NumberWithUnits NumberWithUnits::operator+(const NumberWithUnits &number) const {
     const NumberWithUnits &nconverted = number.convert_to_type(this->unit);
     return NumberWithUnits{this->val + nconverted.val, this->unit};
 }
@@ -262,12 +262,12 @@ NumberWithUnits &NumberWithUnits::operator--() {
     this->val--;
     return *this;
 }
-const NumberWithUnits NumberWithUnits::operator++(int) {
+NumberWithUnits NumberWithUnits::operator++(int) {
     NumberWithUnits temp = *this;
     this->val++;
     return temp;
 }
-const NumberWithUnits NumberWithUnits::operator--(int) {
+NumberWithUnits NumberWithUnits::operator--(int) {
     NumberWithUnits temp = *this;
     this->val--;
     return temp;
@@ -328,13 +328,13 @@ istream &operator>>(istream &input, NumberWithUnits &c) {
 
     return input;
 }
-const NumberWithUnits operator*(double val, const NumberWithUnits &number) {
+NumberWithUnits operator*(double val, const NumberWithUnits &number) {
     return NumberWithUnits{number.val * val, number.unit};
 }
-const NumberWithUnits operator-(const NumberWithUnits &number) {
+NumberWithUnits operator-(const NumberWithUnits &number) {
     return NumberWithUnits{-number.val, number.unit};
 }
-const NumberWithUnits operator+(const NumberWithUnits &number) {
+NumberWithUnits operator+(const NumberWithUnits &number) {
     return number;
 }
 } // namespace ariel

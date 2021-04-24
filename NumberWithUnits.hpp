@@ -19,8 +19,8 @@ public:
 
     NumberWithUnits(double val, const std::string &unit);
 
-    const NumberWithUnits convert_to_type(const std::string &unit) const;
-    const NumberWithUnits operator*(double val) const;
+    NumberWithUnits convert_to_type(const std::string &unit) const;
+    NumberWithUnits operator*(double val) const;
 
     NumberWithUnits &operator+=(const NumberWithUnits &number);
     NumberWithUnits &operator-=(const NumberWithUnits &number);
@@ -31,19 +31,19 @@ public:
     bool operator!=(const NumberWithUnits &number) const;
     bool operator<=(const NumberWithUnits &number) const;
     bool operator>=(const NumberWithUnits &number) const;
-    const NumberWithUnits operator-(const NumberWithUnits &number) const;
-    const NumberWithUnits operator+(const NumberWithUnits &number) const;
+    NumberWithUnits operator-(const NumberWithUnits &number) const;
+    NumberWithUnits operator+(const NumberWithUnits &number) const;
     NumberWithUnits &operator=(const NumberWithUnits &number);
 
     NumberWithUnits &operator++();
     NumberWithUnits &operator--();
-    const NumberWithUnits operator++(int);
-    const NumberWithUnits operator--(int);
+    NumberWithUnits operator++(int);
+    NumberWithUnits operator--(int);
 
     friend std::ostream &operator<<(std::ostream &os, const NumberWithUnits &c);
     friend std::istream &operator>>(std::istream &input, NumberWithUnits &c);
-    const friend NumberWithUnits operator*(double val, const NumberWithUnits &number);
-    const friend NumberWithUnits operator-(const NumberWithUnits &number);
-    const friend NumberWithUnits operator+(const NumberWithUnits &number);
+    friend NumberWithUnits operator*(double val, const NumberWithUnits &number);
+    friend NumberWithUnits operator-(const NumberWithUnits &number);
+    friend NumberWithUnits operator+(const NumberWithUnits &number);
 };
 }; // namespace ariel
